@@ -1,0 +1,8 @@
+openai
+selenium
+psycopg2-binary
+streamlit
+mailjet_rest
+requests
+python-dotenv
+webdriver-manager
