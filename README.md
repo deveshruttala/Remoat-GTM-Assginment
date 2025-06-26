@@ -1,27 +1,27 @@
-# 🧠 Remoat-GTM-Assignment: Automated AI Newsletter 🚀
+#  Remoat-GTM-Assignment: Automated AI Newsletter 
 
 > **Challenge**: Speech-to-Text Newsletter Automation  
 > **Goal**: Scrape, summarize & send AI news via email, fully automated using Supabase, Gemini/OpenAI, Mailjet & n8n.
 
 ---
 
-## 📌 Key Objectives
+##  Key Objectives
 
-- ✅ **Topic Focused**: Speech-to-Text / Real-time AI
-- ✅ **Automation Flow**: Scraping → Summarization → Emailing
-- ✅ **10+ Editions** Published Automatically
-- ✅ **Zero Manual Intervention** Once Setup
-- ✅ **Added Test Script** Test Code and find errors
+-  **Topic Focused**: Speech-to-Text / Real-time AI
+-  **Automation Flow**: Scraping → Summarization → Emailing
+-  **10+ Editions** Published Automatically
+-  **Zero Manual Intervention** Once Setup
+-  **Added Test Script** Test Code and find errors
 
 ---
 
-## 🔍 Overview
+##  Overview
 
 This project scrapes AI-related articles using RSS, BeautifulSoup, and Selenium. The scraped headlines are summarized using **Gemini** (Google) or **OpenAI** and stored in **Supabase**. Summarized newsletters are emailed via **Mailjet**, with scheduling & manual triggers handled via **n8n** automation workflows.
 
 ---
 
-## 🧱 Architecture Overview
+##  Architecture Overview
 
 ```text
     ┌────────────┐      ┌────────────┐      ┌────────────┐
