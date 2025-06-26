@@ -128,7 +128,7 @@ Watch the full 3-minute walkthrough showing:
 2. Automated newsletter generation
 3. Triggering from n8n
 
- **Demo Video**: [Watch here](Demo%20GTM%20assignment.mp4)
+ **Demo Video**: [Watch here](https://youtu.be/FtwRGwyacmU)
 
 
 
