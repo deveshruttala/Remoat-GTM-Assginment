@@ -1,0 +1,96 @@
+
+{
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "everyX",
+        "value": 60,
+        "unit": "minutes"
+      },
+      "id": "Schedule",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.schedule",
+      "typeVersion": 1,
+      "position": [200, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://www.analyticsvidhya.com/blog/feed/"
+      },
+      "id": "RSS1",
+      "name": "AnalyticsVidhya RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [400, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://www.reddit.com/r/MachineLearning/.rss"
+      },
+      "id": "RSS2",
+      "name": "Reddit ML RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [400, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Filter for keywords\nconst keywords = [\n  'speech-to-text', 'transcription', 'whisper', 'voice', 'audio ai', 'real-time', 'openai', 'text to speech'\n];\nreturn items.filter(item => {\n  const t = (item.json.title || '').toLowerCase();\n  return keywords.some(k => t.includes(k));\n});"
+      },
+      "id": "Filter",
+      "name": "Filter Keywords",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "table": "stories",
+        "columns": "title,url"
+      },
+      "id": "Supabase",
+      "name": "Supabase Insert",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [800, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_GEMINI_API_KEY",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        { \"text\": \"Summarize the following AI news headlines in a short, friendly newsletter:\\n\" + items.map(i => `- ${i.json.title} (${i.json.url})`).join(\"\\n\") }\n      ]\n    }\n  ]\n}"
+      },
+      "id": "Gemini",
+      "name": "Summarize with Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "YOUR_SENDER_EMAIL",
+        "toEmail": "RECIPIENT_EMAILS_COMMA_SEPARATED",
+        "subject": "🧠 Daily AI Newsletter",
+        "text": "={{ $json[\"candidates\"][0][\"content\"][\"parts\"][0][\"text\"] }}",
+        "html": "<pre>{{ $json[\"candidates\"][0][\"content\"][\"parts\"][0][\"text\"] }}</pre>"
+      },
+      "id": "Mailjet",
+      "name": "Mailjet Send",
+      "type": "n8n-nodes-base.mailjet",
+      "typeVersion": 1,
+      "position": [1200, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": { "main": [ [ { "node": "AnalyticsVidhya RSS", "type": "main", "index": 0 }, { "node": "Reddit ML RSS", "type": "main", "index": 0 } ] ] },
+    "AnalyticsVidhya RSS": { "main": [ [ { "node": "Filter Keywords", "type": "main", "index": 0 } ] ] },
+    "Reddit ML RSS": { "main": [ [ { "node": "Filter Keywords", "type": "main", "index": 0 } ] ] },
+    "Filter Keywords": { "main": [ [ { "node": "Supabase Insert", "type": "main", "index": 0 } ] ] },
+    "Supabase Insert": { "main": [ [ { "node": "Summarize with Gemini", "type": "main", "index": 0 } ] ] },
+    "Summarize with Gemini": { "main": [ [ { "node": "Mailjet Send", "type": "main", "index": 0 } ] ] }
+  }
+}
