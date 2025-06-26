@@ -1,9 +1,0 @@
-requests
-beautifulsoup4
-feedparser
-openai
-supabase
-python-dotenv
-selenium
-webdriver-manager
-mailjet_rest
