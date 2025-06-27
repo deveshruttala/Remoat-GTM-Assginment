@@ -71,10 +71,15 @@ def status():
 @app.route("/top5")
 def top5():
     try:
-        res = supabase.table("stories").select("*").order("created_at", desc=True).limit(5).execute()
+        # Try ordering by created_at, fallback if it fails
+        try:
+            res = supabase.table("stories").select("*").order("created_at", desc=True).limit(5).execute()
+        except Exception:
+            res = supabase.table("stories").select("*").limit(5).execute()
         return jsonify(res.data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 
 @app.route("/")
