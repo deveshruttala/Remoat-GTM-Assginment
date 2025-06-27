@@ -9,6 +9,7 @@ from main import fetch_stories, save_to_supabase, generate_newsletter, send_news
 
 # Load environment variables
 load_dotenv()
+
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 INTERVAL = int(os.getenv("INTERVAL_MINUTES", 60))
@@ -23,21 +24,24 @@ latest_summary = ""
 
 
 def run_cycle():
-    global scrape_count, latest_summary
+    global scrape_count, latest_summary, running
     while running:
         try:
+            print("⏳ Running scheduled cycle...")
             stories = fetch_stories()
             scrape_count = len(stories)
             if stories:
                 save_to_supabase(stories)
                 latest_summary = generate_newsletter(stories)
                 send_newsletter(latest_summary)
+            else:
+                print("⚠️ No stories found.")
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            print(f"❌ Error in cycle: {e}")
         time.sleep(INTERVAL * 60)
 
 
-@app.route("/start", methods=[POST])
+@app.route("/start", methods=["POST"])
 def start_cycle():
     global running, thread
     if not running:
@@ -48,7 +52,7 @@ def start_cycle():
     return jsonify({"status": "already running"})
 
 
-@app.route("/stop", methods=[POST])
+@app.route("/stop", methods=["POST"])
 def stop_cycle():
     global running
     running = False
@@ -60,7 +64,7 @@ def status():
     return jsonify({
         "running": running,
         "last_scrape_count": scrape_count,
-        "last_summary": latest_summary[:500]  # Trim to avoid huge response
+        "last_summary": latest_summary[:500]
     })
 
 
@@ -75,8 +79,11 @@ def top5():
 
 @app.route("/")
 def index():
-    return "<h1>AI Newsletter Bot</h1><ul><li><a href='/status'>Status</a></li><li><a href='/top5'>Top 5 from Supabase</a></li></ul>"
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    return """
+    <h1>🤖 AI Newsletter Control Panel</h1>
+    <form method="post" action="/start"><button>🚀 Start Newsletter Bot</button></form>
+    <form method="post" action="/stop"><button>🛑 Stop Bot</button></form>
+    <p><a href="/status">🔍 View Status</a></p>
+    <p><a href="/top5">📰 View Top 5 Articles</a></p>
+    <br><p>Bot running: <b>{}</b><br>Last scrape: <b>{}</b> stories</p>
+    """.format(running, scrape_count)
