@@ -7,3 +7,5 @@ python-dotenv
 selenium
 webdriver-manager
 mailjet_rest
+gunicorn
+google-generativeai
